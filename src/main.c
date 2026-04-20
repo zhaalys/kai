@@ -6,18 +6,24 @@
  * Memory for the buffer is allocated and must be freed by the caller.
  */
 char* load_file(const char* filename) {
-    FILE* f = fopen(filename, "r");
+    FILE* f = fopen(filename, "rb");
     if (!f) {
-        perror("Error opening file");
+        fprintf(stderr, "Error: Could not open input file '%s'\n", filename);
         return NULL;
     }
 
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
+    if (size == 0) {
+        fprintf(stderr, "Error: Input file '%s' is empty\n", filename);
+        fclose(f);
+        return NULL;
+    }
     fseek(f, 0, SEEK_SET);
 
     char* buffer = malloc(size + 1);
     if (!buffer) {
+        fprintf(stderr, "Error: Could not allocate memory for input file\n");
         fclose(f);
         return NULL;
     }
