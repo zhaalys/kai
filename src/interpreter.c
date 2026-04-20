@@ -23,8 +23,9 @@ int bf_init(BFState *state, const char *code) {
             stack[stack_ptr++] = i;
         } else if (state->code[i] == ']') {
             if (stack_ptr == 0) {
+                fprintf(stderr, "Error: Unbalanced brackets (extra ']' at index %u)\n", i);
                 free(stack);
-                return 2; // Unbalanced brackets
+                return 2;
             }
             uint32_t open_index = stack[--stack_ptr];
             state->jump_table[open_index] = i;
@@ -33,7 +34,10 @@ int bf_init(BFState *state, const char *code) {
     }
 
     free(stack);
-    if (stack_ptr != 0) return 3; // Unbalanced brackets
+    if (stack_ptr != 0) {
+        fprintf(stderr, "Error: Unbalanced brackets (%u unclosed '[' brackets)\n", stack_ptr);
+        return 3;
+    }
 
     return 0;
 }
